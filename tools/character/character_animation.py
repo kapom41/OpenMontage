@@ -9,6 +9,7 @@ preview/review outputs.
 from __future__ import annotations
 
 import json
+import re
 import shutil
 import subprocess
 import time
@@ -37,8 +38,14 @@ def _write_json(path: str | None, data: dict[str, Any]) -> list[str]:
 
 
 def _slug(value: str) -> str:
-    chars = [c.lower() if c.isalnum() else "-" for c in value.strip()]
-    return "-".join("".join(chars).split("-")).strip("-") or "character"
+    """Generate a short, deterministic ID from a name.
+    
+    Format: <short-slug>-<hash8> (max ~24 chars)
+    """
+    import hashlib
+    slug_part = re.sub(r"[^a-z0-9]+", "-", value.lower()).strip("-")[:16]
+    hash_part = hashlib.sha256(value.encode()).hexdigest()[:8]
+    return f"{slug_part}-{hash_part}" if slug_part else f"character-{hash_part}"
 
 
 def _character_color(index: int) -> tuple[str, str]:

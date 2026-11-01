@@ -1,0 +1,55 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Title Thumbnail Result",
+  "type": "object",
+  "properties": {
+    "title_options": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "title": {"type": "string"},
+          "thumbnail_text": {"type": "string"},
+          "score": {"type": "integer"},
+          "chars": {"type": "integer"},
+          "issues": {"type": "array", "items": {"type": "object"}},
+          "good": {"type": "array", "items": {"type": "string"}},
+          "desktop_truncated": {"type": "boolean"},
+          "mobile_truncated": {"type": "boolean"}
+        },
+        "required": ["title", "thumbnail_text", "score", "chars", "issues", "good", "desktop_truncated", "mobile_truncated"]
+      }
+    },
+    "winner": {
+      "type": "object",
+      "properties": {
+        "title": {"type": "string"},
+        "thumbnail_text": {"type": "string"},
+        "score": {"type": "integer"},
+        "chars": {"type": "integer"},
+        "issues": {"type": "array", "items": {"type": "object"}},
+        "good": {"type": "array", "items": {"type": "string"}},
+        "desktop_truncated": {"type": "boolean"},
+        "mobile_truncated": {"type": "boolean"}
+      },
+      "required": ["title", "thumbnail_text", "score", "chars", "issues", "good", "desktop_truncated", "mobile_truncated"]
+    },
+    "thumbnail_brief": {
+      "type": "object",
+      "properties": {
+        "title": {"type": "string"},
+        "thumbnail_text": {"type": "string"},
+        "expression": {"type": "string"},
+        "framing": {"type": "string"},
+        "background_action": {"type": "string"},
+        "color_scheme": {"type": "array", "items": {"type": "string"}},
+        "contrast_notes": {"type": "string"},
+        "font_style": {"type": "string"},
+        "text_position": {"type": "string"}
+      },
+      "required": ["title", "thumbnail_text", "expression", "framing", "background_action", "color_scheme", "contrast_notes", "font_style", "text_position"]
+    },
+    "generated_at": {"type": "string"}
+  },
+  "required": ["title_options", "winner", "thumbnail_brief", "generated_at"]
+}

@@ -20,6 +20,8 @@ from schemas.artifacts import ARTIFACT_NAMES, validate_artifact
 ALL_KNOWN_STAGES = frozenset([
     "research", "proposal", "idea", "script", "scene_plan",
     "assets", "edit", "compose", "publish",
+    "trends", "creative_direction", "visual_generation", "narration",
+    "subtitles", "montage", "quality_control",
 ])
 
 # Backward-compatible alias — existing code / tests that import STAGES still work.
@@ -37,6 +39,13 @@ CANONICAL_STAGE_ARTIFACTS = {
     "edit": "edit_decisions",
     "compose": "render_report",
     "publish": "publish_log",
+    "trends": "trend_report",
+    "creative_direction": "creative_direction",
+    "visual_generation": "asset_manifest",
+    "narration": "asset_manifest",
+    "subtitles": "subtitles",
+    "montage": "edit_decisions",
+    "quality_control": "qc_report",
 }
 
 # Additional artifacts that may be produced alongside canonical ones.
@@ -85,7 +94,7 @@ CHECKPOINT_SCHEMA_PATH = (
 # live under PROJECTS_DIR/<project_id>/ — this is the location the Backlot
 # board watches. Callers may still pass a different pipeline_dir (tests do),
 # but production runs should use the default.
-from lib.paths import PROJECTS_DIR  # noqa: E402  (single source of truth)
+from lib.paths import PROJECTS_DIR, safe_checkpoint_path, safe_project_path  # noqa: E402
 
 PROJECT_MARKER_FILENAME = "project.json"
 HISTORY_DIRNAME = "history"
@@ -192,6 +201,8 @@ def validate_checkpoint(checkpoint: dict[str, Any]) -> None:
 
 
 def _checkpoint_path(pipeline_dir: Path, project_id: str, stage: str) -> Path:
+    if pipeline_dir == PROJECTS_DIR:
+        return safe_checkpoint_path(project_id, stage)
     return pipeline_dir / project_id / f"checkpoint_{stage}.json"
 
 
@@ -214,7 +225,10 @@ def init_project(
     """
     _validate_style_playbook(style_playbook)
     base = pipeline_dir or PROJECTS_DIR
-    project_dir = base / project_id
+    if base == PROJECTS_DIR:
+        project_dir = safe_project_path(project_id)
+    else:
+        project_dir = base / project_id
     for sub in (
         "artifacts",
         "assets/images",

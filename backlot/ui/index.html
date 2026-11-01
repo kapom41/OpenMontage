@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Backlot — Library</title>
+<title>Backlot — Viral Cinematic Studio</title>
 <link rel="stylesheet" href="/ui/board.css">
 </head>
 <body>
@@ -12,12 +12,31 @@
     <div class="clapper"></div>
     <div>
       <span class="wordmark">Backlot</span>
-      <h1>Library</h1>
+      <h1>Viral Cinematic Studio</h1>
     </div>
     <span class="chip" id="count"></span>
     <div class="spacer"></div>
     <span class="live idle" id="liveBadge"><span class="dot"></span><span id="liveText">IDLE</span></span>
   </header>
+  <section class="production-launcher" aria-labelledby="production-title">
+    <div>
+      <p class="eyebrow">AI-POWERED VIRAL VIDEO PRODUCTION</p>
+      <h2 id="production-title">Create a cinematic video</h2>
+      <p class="hint">Enter a title and idea. Backlot researches trends, designs cinematic visuals, writes hook-driven scripts, generates AI visuals, narrates with prosody, composes music, edits with cinematic transitions, and validates quality.</p>
+    </div>
+    <form id="productionForm" class="production-form">
+      <label>Video title<input id="productionTitle" name="title" required maxlength="160" placeholder="Kodak: The Camera That Missed the Future"></label>
+      <label>Video idea<textarea id="productionIdea" name="idea" required maxlength="2000" rows="3" placeholder="The rise and fall of Kodak and its failure to adapt to digital photography."></textarea></label>
+      <div class="production-options">
+        <label>Language<input id="productionLanguage" name="language" value="en" maxlength="16"></label>
+        <label>Duration (seconds)<input id="productionDuration" name="duration_seconds" type="number" min="20" max="600" value="45"></label>
+        <label>Format<select id="productionFormat" name="aspect_ratio"><option value="16:9">16:9 (YouTube)</option><option value="9:16">9:16 (Shorts/Reels/TikTok)</option></select></label>
+        <label>Style<select id="productionStyle" name="visual_style"><option value="cinematic">Cinematic</option><option value="documentary">Documentary</option><option value="educational">Educational</option><option value="viral">Viral/Entertainment</option></select></label>
+      </div>
+      <button class="production-submit" type="submit">Generate Viral Video</button>
+      <p id="productionStatus" class="hint" role="status"></p>
+    </form>
+  </section>
   <div class="lib-grid" id="grid"></div>
   <p class="hint" id="empty" style="display:none">No projects yet — run a production and it will appear here.</p>
 </div>

@@ -1,6 +1,8 @@
 import { el, fmtAgo, getJSON, subscribe, thumbURL } from "/ui/lib.js";
 
 const grid = document.getElementById("grid");
+const productionForm = document.getElementById("productionForm");
+const productionStatus = document.getElementById("productionStatus");
 const THEME_KEY = "backlot.theme";
 let currentTheme = localStorage.getItem(THEME_KEY) === "light" ? "light" : "dark";
 
@@ -89,3 +91,30 @@ render().catch(console.error);
 if (!new URLSearchParams(location.search).has("static")) {
   subscribe("/api/library/events", () => render().catch(console.error));
 }
+
+productionForm?.addEventListener("submit", async (event) => {
+  event.preventDefault();
+  const button = productionForm.querySelector("button[type=submit]");
+  button.disabled = true;
+  productionStatus.textContent = "Starting viral cinematic production…";
+  const payload = {
+    title: document.getElementById("productionTitle").value.trim(),
+    idea: document.getElementById("productionIdea").value.trim(),
+    language: document.getElementById("productionLanguage").value.trim() || "en",
+    duration_seconds: Number(document.getElementById("productionDuration").value || 45),
+    aspect_ratio: document.getElementById("productionFormat").value || "16:9",
+    visual_style: document.getElementById("productionStyle").value.trim() || "cinematic",
+  };
+  try {
+    const response = await fetch("/api/productions", {
+      method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify(payload),
+    });
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.detail || "Production could not be started.");
+    productionStatus.textContent = "Production started. Opening live board…";
+    location.href = data.project_url;
+  } catch (error) {
+    productionStatus.textContent = error.message;
+    button.disabled = false;
+  }
+});

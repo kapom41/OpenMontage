@@ -1,0 +1,44 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "openmontage/artifacts/trend_report",
+  "title": "Trend Intelligence Report",
+  "description": "Viral video pattern analysis from public sources.",
+  "type": "object",
+  "required": ["topic", "patterns", "recommended_hooks", "recommended_structures", "visual_keywords", "audio_keywords", "generated_at", "cache_hit", "real_data_count", "estimated_data_count"],
+  "properties": {
+    "topic": { "type": "string" },
+    "patterns": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "hook_type": { "type": "string" },
+          "structure": { "type": "string" },
+          "visual_style": { "type": "string" },
+          "pacing": { "type": "string" },
+          "audio_design": { "type": "string" },
+          "caption_style": { "type": "string" },
+          "platform": { "type": "string" },
+          "source_url": { "type": "string" },
+          "observed_at": { "type": "string" },
+          "confidence": { "type": "number" },
+          "source_type": { "type": "string", "enum": ["real_youtube", "real_archive", "estimated"] },
+          "view_count": { "type": "integer" },
+          "channel_subscribers": { "type": "integer" },
+          "engagement_rate": { "type": "number" },
+          "published_at": { "type": "string" },
+          "data_fetched_at": { "type": "string" }
+        }
+      }
+    },
+    "recommended_hooks": { "type": "array", "items": { "type": "string" } },
+    "recommended_structures": { "type": "array", "items": { "type": "string" } },
+    "visual_keywords": { "type": "array", "items": { "type": "string" } },
+    "audio_keywords": { "type": "array", "items": { "type": "string" } },
+    "generated_at": { "type": "string" },
+    "cache_hit": { "type": "boolean" },
+    "real_data_count": { "type": "integer" },
+    "estimated_data_count": { "type": "integer" }
+  },
+  "additionalProperties": false
+}

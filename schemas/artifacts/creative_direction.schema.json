@@ -1,0 +1,49 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "openmontage/artifacts/creative_direction",
+  "title": "Creative Direction",
+  "description": "Cinematic visual narrative direction for a video.",
+  "type": "object",
+  "required": ["title", "core_concept", "hook", "narrative_arc", "visual_identity", "color_palette", "scenes", "music_direction", "sound_design_notes", "subtitle_style", "target_duration", "aspect_ratio", "generated_at"],
+  "properties": {
+    "title": { "type": "string" },
+    "core_concept": { "type": "string" },
+    "hook": { "type": "string" },
+    "narrative_arc": { "type": "array", "items": { "type": "string" } },
+    "visual_identity": { "type": "string" },
+    "color_palette": { "type": "array", "items": { "type": "string" } },
+    "scenes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "narrative_beat": { "type": "string" },
+          "visual_concept": { "type": "string" },
+          "shot_description": { "type": "string" },
+          "camera_movement": { "type": "string" },
+          "lighting": { "type": "string" },
+          "color_palette": { "type": "string" },
+          "duration_seconds": { "type": "number" },
+          "transition_in": { "type": "string" },
+          "transition_out": { "type": "string" },
+          "is_hero_moment": { "type": "boolean" },
+          "ai_generation_prompt": { "type": "string" },
+          "archive_fallback_query": { "type": "string" },
+          "visual_reference": { "type": "string" },
+          "rationale": { "type": "string" },
+          "start_seconds": { "type": "number" },
+          "end_seconds": { "type": "number" }
+        },
+        "additionalProperties": true
+      }
+    },
+    "music_direction": { "type": "string" },
+    "sound_design_notes": { "type": "string" },
+    "subtitle_style": { "type": "string" },
+    "target_duration": { "type": "number" },
+    "aspect_ratio": { "type": "string" },
+    "generated_at": { "type": "string" }
+  },
+  "additionalProperties": false
+}

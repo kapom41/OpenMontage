@@ -1,0 +1,54 @@
+name: autonomous-documentary
+version: "1.0"
+description: Local-first, zero-cost documentary workflow started from a title and idea.
+category: documentary
+stability: beta
+default_checkpoint_policy: auto_noncreative
+orchestration:
+  mode: local-autonomous
+  budget_default_usd: 0
+  max_wall_time_minutes: 120
+extensions:
+  custom_scripts: true
+  custom_playbooks: true
+  custom_skills: true
+  custom_tools: false
+stages:
+  - name: research
+    agent: ResearchAgent
+    produces: [research_brief]
+    optional_tools: [direct_clip_search]
+    checkpoint_required: true
+    human_approval_default: false
+  - name: script
+    agent: ScriptwriterAgent
+    required_artifacts_in: [research_brief]
+    produces: [script]
+    checkpoint_required: true
+    human_approval_default: false
+  - name: scene_plan
+    agent: StoryboardAgent
+    required_artifacts_in: [script]
+    produces: [scene_plan]
+    checkpoint_required: true
+    human_approval_default: false
+  - name: assets
+    agent: VisualResearchAgent
+    required_artifacts_in: [scene_plan]
+    produces: [asset_manifest]
+    optional_tools: [direct_clip_search, piper_tts, music_library, local_diffusion]
+    checkpoint_required: true
+    human_approval_default: false
+  - name: edit
+    agent: VideoEditorAgent
+    required_artifacts_in: [scene_plan, asset_manifest]
+    produces: [edit_decisions]
+    checkpoint_required: true
+    human_approval_default: false
+  - name: compose
+    agent: ExportAgent
+    required_artifacts_in: [edit_decisions, asset_manifest]
+    produces: [render_report]
+    required_tools: [video_compose]
+    checkpoint_required: true
+    human_approval_default: false

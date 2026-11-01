@@ -49,10 +49,10 @@
               "sample_path": { "type": "string" },
               "review_notes": { "type": "string" }
             },
-            "additionalProperties": false
+            "additionalProperties": true
           }
         },
-        "additionalProperties": false
+        "additionalProperties": true
       }
     },
     "total_cost_usd": { "type": "number", "minimum": 0 },

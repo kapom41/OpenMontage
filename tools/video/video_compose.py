@@ -690,10 +690,77 @@ class VideoCompose(BaseTool):
                 cmd.extend(["-c:v", "copy"])
 
             if audio_path and Path(audio_path).exists():
-                # Use type-based selectors (0:v, 1:a) instead of index-based
-                # (0:v:0) because source videos may have audio as stream 0
-                # and video as stream 1 (e.g. Kling-generated clips).
-                cmd.extend(["-map", "0:v", "-map", "1:a", "-c:a", "aac", "-shortest"])
+                # Probe audio duration to handle A/V sync correctly
+                audio_duration = 0.0
+                try:
+                    import subprocess, json
+                    probe_cmd = [
+                        "ffprobe", "-v", "error", "-show_entries", "format=duration",
+                        "-of", "json", str(audio_path)
+                    ]
+                    probe_result = subprocess.run(probe_cmd, capture_output=True, text=True, timeout=30)
+                    if probe_result.returncode == 0:
+                        probe_data = json.loads(probe_result.stdout)
+                        audio_duration = float(probe_data.get("format", {}).get("duration", 0.0))
+                except Exception:
+                    pass
+                
+                # Probe actual video duration from concatenated input
+                total_visual_duration = 0.0
+                try:
+                    probe_cmd = [
+                        "ffprobe", "-v", "error", "-show_entries", "format=duration",
+                        "-of", "json", str(final_input)
+                    ]
+                    probe_result = subprocess.run(probe_cmd, capture_output=True, text=True, timeout=30)
+                    if probe_result.returncode == 0:
+                        probe_data = json.loads(probe_result.stdout)
+                        total_visual_duration = float(probe_data.get("format", {}).get("duration", 0.0))
+                except Exception:
+                    pass
+                
+                # Fallback to cut durations if probe fails
+                if total_visual_duration <= 0:
+                    total_visual_duration = sum(cut["out_seconds"] - cut["in_seconds"] for cut in cuts)
+                
+                print(f"[video_compose] total_visual_duration (probed): {total_visual_duration:.2f}s")
+                print(f"[video_compose] audio_duration (probed): {audio_duration:.2f}s")
+                
+                if audio_duration > total_visual_duration:
+                    # Audio is longer - extend video by looping last frames
+                    # Calculate how many frames to loop (last 1 second at 30fps = 30 frames)
+                    # Loop from the last 30 frames to extend to audio duration
+                    extend_seconds = audio_duration - total_visual_duration
+                    loop_frames = min(30, int(total_visual_duration * 30))  # Last 1 second or less
+                    start_frame = max(0, int(total_visual_duration * 30) - loop_frames)
+                    loop_filter = f"loop=loop=-1:size={loop_frames}:start={start_frame}"
+                    vfilters.append(loop_filter)
+                    print(f"[video_compose] EXTENDING VIDEO by {extend_seconds:.2f}s using loop filter (loop=-1:size={loop_frames}:start={start_frame})")
+                    
+                    if needs_reencode:
+                        if vfilters:
+                            cmd.extend(["-vf", ",".join(vfilters)])
+                        cmd.extend(["-c:v", codec, "-crf", str(crf), "-preset", preset])
+                        cmd.extend(profile_flags)
+                    else:
+                        # Need to re-encode to apply loop filter
+                        if vfilters:
+                            cmd.extend(["-vf", ",".join(vfilters)])
+                        cmd.extend(["-c:v", codec, "-crf", str(crf), "-preset", preset])
+                        cmd.extend(profile_flags)
+                    
+                    cmd.extend(["-map", "0:v", "-map", "1:a", "-c:a", "aac", "-af", f"apad=whole_dur={audio_duration}", "-t", str(audio_duration)])
+                else:
+                    # Video is longer or equal - use shortest or visual duration
+                    if needs_reencode:
+                        if vfilters:
+                            cmd.extend(["-vf", ",".join(vfilters)])
+                        cmd.extend(["-c:v", codec, "-crf", str(crf), "-preset", preset])
+                        cmd.extend(profile_flags)
+                    else:
+                        cmd.extend(["-c:v", "copy"])
+                    
+                    cmd.extend(["-map", "0:v", "-map", "1:a", "-c:a", "aac", "-shortest"])
             else:
                 cmd.extend(["-c:a", "copy"])
 

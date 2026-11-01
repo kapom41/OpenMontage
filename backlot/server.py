@@ -14,7 +14,8 @@ from contextlib import asynccontextmanager, suppress
 from pathlib import Path
 from typing import Optional
 
-from fastapi import FastAPI, HTTPException, Request
+from fastapi import BackgroundTasks, FastAPI, HTTPException, Request
+from pydantic import BaseModel, Field
 from fastapi.middleware.trustedhost import TrustedHostMiddleware
 from fastapi.responses import FileResponse, HTMLResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
@@ -74,13 +75,90 @@ class ChangeHub:
 
 hub = ChangeHub()
 
+
+class ProductionRequest(BaseModel):
+    """The intentionally small input surface for the zero-cost viral cinematic runner."""
+
+    title: str = Field(min_length=1, max_length=160)
+    idea: str = Field(min_length=1, max_length=2_000)
+    language: str = Field(default="en", min_length=2, max_length=16)
+    duration_seconds: float = Field(default=45, ge=20, le=600)
+    aspect_ratio: str = Field(default="16:9", pattern="^(16:9|9:16)$")
+    visual_style: str = Field(default="cinematic", max_length=80)
+
+
+async def _run_viral_cinematic_production(request: ProductionRequest) -> None:
+    """Run outside the request lifecycle so the board can stream progress."""
+    from lib.viral_cinematic_runner import ViralCinematicRunner
+    from lib.viral_cinematic_runner import _slug
+    import time
+    
+    project_id = _slug(request.title)
+    try:
+        _set_production_status(project_id, "initializing", 5.0)
+        
+        runner = ViralCinematicRunner(
+            request.title, request.idea,
+            language=request.language,
+            duration_seconds=request.duration_seconds,
+            aspect_ratio=request.aspect_ratio,
+            visual_style=request.visual_style,
+        )
+        
+        # Manually run stages to track progress
+        stages = [
+            ("trends", 10.0),
+            ("viral_patterns", 15.0),
+            ("creative_direction", 20.0),
+            ("hook_script", 25.0),
+            ("title_thumbnail", 30.0),
+            ("script", 35.0),
+            ("narration", 45.0),
+            ("subtitles", 50.0),
+            ("scene_plan", 55.0),
+            ("visual_generation", 70.0),
+            ("montage", 80.0),
+            ("compose", 90.0),
+            ("quality_control", 95.0),
+            ("retention_analysis", 97.0),
+            ("creative_memory", 99.0),
+        ]
+        
+        # Since we can't easily hook into individual stages, run the whole thing
+        # and update status at start/end
+        _set_production_status(project_id, "running", 10.0)
+        
+        result = await asyncio.to_thread(runner.run)
+        
+        _set_production_status(project_id, "completed", 100.0, completed=True)
+        
+    except Exception as e:
+        _set_production_status(project_id, "error", error=str(e), completed=True)
+
 # Library summaries are expensive to derive (full state parse per project);
 # cache per project and invalidate from the watcher.
 _summary_cache: dict[str, dict] = {}
-
+_production_status: dict[str, dict] = {}  # project_id -> {stage, progress, error, started_at, completed_at}
 
 def _invalidate_summary(project_id: str) -> None:
     _summary_cache.pop(project_id, None)
+
+
+def _set_production_status(project_id: str, stage: str, progress: float = 0.0, error: str = None, completed: bool = False) -> None:
+    """Update production status for real-time tracking."""
+    import time
+    now = time.time()
+    if project_id not in _production_status:
+        _production_status[project_id] = {"started_at": now}
+    _production_status[project_id].update({
+        "stage": stage,
+        "progress": progress,
+        "error": error,
+        "updated_at": now,
+    })
+    if completed:
+        _production_status[project_id]["completed_at"] = now
+        _production_status[project_id]["progress"] = 100.0
 
 
 def _cached_summaries() -> list[dict]:
@@ -172,6 +250,17 @@ def create_app() -> FastAPI:
     async def health() -> dict:
         return {"ok": True, "app": "backlot"}
 
+    @app.post("/api/productions", status_code=202)
+    async def start_production(payload: ProductionRequest, background_tasks: BackgroundTasks) -> dict:
+        """Start the viral cinematic workflow from title and idea."""
+        from lib.viral_cinematic_runner import _slug
+
+        project_id = _slug(payload.title)
+        if (PROJECTS_DIR / project_id).is_dir():
+            raise HTTPException(status_code=409, detail="A project with this title already exists. Use a different title to preserve it.")
+        background_tasks.add_task(_run_viral_cinematic_production, payload)
+        return {"accepted": True, "project_id": project_id, "project_url": f"/p/{project_id}"}
+
     @app.get("/api/projects")
     async def projects() -> list:
         return await asyncio.to_thread(_cached_summaries)
@@ -180,6 +269,13 @@ def create_app() -> FastAPI:
     async def project_state(project_id: str) -> dict:
         project_dir = _safe_project_dir(project_id)
         return await asyncio.to_thread(load_board_state, project_dir)
+
+    @app.get("/api/project/{project_id}/production-status")
+    async def production_status(project_id: str) -> dict:
+        """Get real-time production status."""
+        _safe_project_dir(project_id)  # 404 early for unknown projects
+        status = _production_status.get(project_id, {"stage": "unknown", "progress": 0.0})
+        return status
 
     @app.get("/api/project/{project_id}/events")
     async def project_events(project_id: str, request: Request) -> StreamingResponse:

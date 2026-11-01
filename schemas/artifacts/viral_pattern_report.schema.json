@@ -1,0 +1,45 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Viral Pattern Report",
+  "type": "object",
+  "properties": {
+    "topic": {"type": "string"},
+    "patterns": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "hook_type": {"type": "string"},
+          "hook_formula_id": {"type": "string"},
+          "hook_formula_name": {"type": "string"},
+          "hook_score": {"type": "integer"},
+          "narrative_structure": {"type": "string"},
+          "visual_style": {"type": "string"},
+          "pacing": {"type": "string"},
+          "audio_design": {"type": "string"},
+          "caption_style": {"type": "string"},
+          "retention_techniques": {"type": "array", "items": {"type": "string"}},
+          "scene_transitions": {"type": "array", "items": {"type": "string"}},
+          "platform": {"type": "string"},
+          "source_url": {"type": "string"},
+          "views": {"type": "integer"},
+          "channel_median_views": {"type": "integer"},
+          "multiple": {"type": "number"},
+          "confidence": {"type": "number"},
+          "analyzed_at": {"type": "string"}
+        },
+        "required": ["hook_type", "hook_formula_id", "hook_formula_name", "hook_score", "narrative_structure", "visual_style", "pacing", "audio_design", "caption_style", "retention_techniques", "scene_transitions", "platform", "source_url", "views", "channel_median_views", "multiple", "confidence", "analyzed_at"]
+      }
+    },
+    "top_hook_formulas": {"type": "array", "items": {"type": "object"}},
+    "top_structures": {"type": "array", "items": {"type": "object"}},
+    "visual_keywords": {"type": "array", "items": {"type": "string"}},
+    "audio_keywords": {"type": "array", "items": {"type": "string"}},
+    "retention_techniques": {"type": "array", "items": {"type": "string"}},
+    "recommended_hooks": {"type": "array", "items": {"type": "string"}},
+    "recommended_structures": {"type": "array", "items": {"type": "string"}},
+    "generated_at": {"type": "string"},
+    "cache_hit": {"type": "boolean"}
+  },
+  "required": ["topic", "patterns", "top_hook_formulas", "top_structures", "visual_keywords", "audio_keywords", "retention_techniques", "recommended_hooks", "recommended_structures", "generated_at", "cache_hit"]
+}

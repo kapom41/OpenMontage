@@ -65,6 +65,27 @@ internal/
 # Agent skills lock (local install tracking)
 skills-lock.json
 
+# Python virtual environments (not shipped)
+.venv311/
+
+# Local trend cache (regenerable from APIs)
+.trend_cache/
+
+# Test/scratch artifacts (auto-generated during development)
+test_*.mp4
+test_*.wav
+test_*.png
+test_*.py
+test_*.txt
+concat_list.txt
+proto_explorer_rig.json
+uncomment_methods*.py
+fix_indent.py
+restore_methods.py
+rewrite_section.py
+test_compile.py
+creative_memory.db
+
 # Generated images (logo drafts — final logo lives in assets/)
 logo_*.png
 generated_image.png

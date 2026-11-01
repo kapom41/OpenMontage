@@ -1,0 +1,46 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Hook Script Result",
+  "type": "object",
+  "properties": {
+    "topic": {"type": "string"},
+    "hook_options": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "text": {"type": "string"},
+          "formula_id": {"type": "string"},
+          "formula_name": {"type": "string"},
+          "score": {"type": "integer"},
+          "band": {"type": "string"},
+          "properties": {"type": "object"},
+          "matched_patterns": {"type": "integer"},
+          "weakest_property": {"type": "string"},
+          "weakest_fix": {"type": "string"}
+        },
+        "required": ["text", "formula_id", "formula_name", "score", "band", "properties", "matched_patterns", "weakest_property", "weakest_fix"]
+      }
+    },
+    "winning_hook": {
+      "type": "object",
+      "properties": {
+        "text": {"type": "string"},
+        "formula_id": {"type": "string"},
+        "formula_name": {"type": "string"},
+        "score": {"type": "integer"},
+        "band": {"type": "string"},
+        "properties": {"type": "object"},
+        "matched_patterns": {"type": "integer"},
+        "weakest_property": {"type": "string"},
+        "weakest_fix": {"type": "string"}
+      },
+      "required": ["text", "formula_id", "formula_name", "score", "band", "properties", "matched_patterns", "weakest_property", "weakest_fix"]
+    },
+    "script": {"type": "object"},
+    "runtime_estimate_minutes": {"type": "number"},
+    "formula_rationale": {"type": "string"},
+    "generated_at": {"type": "string"}
+  },
+  "required": ["topic", "hook_options", "winning_hook", "script", "runtime_estimate_minutes", "formula_rationale", "generated_at"]
+}

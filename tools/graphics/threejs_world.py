@@ -57,8 +57,16 @@ def _integer(value: Any, default: int) -> int:
 
 
 def _slug(value: Any, fallback: str) -> str:
-    text = re.sub(r"[^a-z0-9]+", "-", str(value or "").lower()).strip("-")
-    return text or fallback
+    """Generate a short, deterministic ID from a value with fallback.
+    
+    Format: <short-slug>-<hash8> (max ~24 chars)
+    """
+    import hashlib
+    text = re.sub(r"[^a-z0-9]+", "-", str(value or "").lower()).strip("-")[:16]
+    if not text:
+        text = fallback[:16]
+    hash_part = hashlib.sha256(str(value).encode()).hexdigest()[:8]
+    return f"{text}-{hash_part}"
 
 
 def _color(value: Any, default: str) -> str:

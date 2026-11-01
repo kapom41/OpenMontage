@@ -1,0 +1,108 @@
+name: viral-cinematic
+version: "2.0"
+description: AI-powered viral cinematic video production from title and idea. Includes viral pattern analysis, hook scoring, title/thumbnails, retention prediction, and creative memory.
+category: cinematic
+stability: beta
+default_checkpoint_policy: auto_noncreative
+orchestration:
+  mode: local-autonomous
+  budget_default_usd: 0
+  max_wall_time_minutes: 240
+extensions:
+  custom_scripts: true
+  custom_playbooks: true
+  custom_skills: true
+  custom_tools: false
+stages:
+  - name: trends
+    agent: TrendIntelligenceAgent
+    produces: [trend_report]
+    checkpoint_required: true
+    human_approval_default: false
+  - name: viral_patterns
+    agent: ViralPatternAgent
+    required_artifacts_in: [trend_report]
+    produces: [viral_pattern_report]
+    checkpoint_required: true
+    human_approval_default: false
+  - name: creative_direction
+    agent: CreativeDirectorAgent
+    required_artifacts_in: [trend_report, viral_pattern_report]
+    produces: [creative_direction]
+    checkpoint_required: true
+    human_approval_default: false
+  - name: hook_script
+    agent: HookScriptAgent
+    required_artifacts_in: [creative_direction]
+    produces: [hook_script_result]
+    checkpoint_required: true
+    human_approval_default: false
+  - name: title_thumbnail
+    agent: TitleThumbnailAgent
+    required_artifacts_in: [creative_direction, hook_script_result]
+    produces: [title_thumbnail_result]
+    checkpoint_required: true
+    human_approval_default: false
+  - name: script
+    agent: ScriptWriterAgent
+    required_artifacts_in: [hook_script_result]
+    produces: [script]
+    checkpoint_required: true
+    human_approval_default: false
+  - name: scene_plan
+    agent: CreativeDirectorAgent
+    required_artifacts_in: [script, creative_direction]
+    produces: [scene_plan]
+    checkpoint_required: true
+    human_approval_default: false
+  - name: visual_generation
+    agent: VisualGenerationAgent
+    required_artifacts_in: [scene_plan, creative_direction]
+    produces: [asset_manifest]
+    optional_tools: [local_visual_gen, enhanced_piper_tts]
+    checkpoint_required: true
+    human_approval_default: false
+  - name: narration
+    agent: NarrationAgent
+    required_artifacts_in: [script]
+    produces: [asset_manifest]
+    optional_tools: [enhanced_piper_tts]
+    checkpoint_required: true
+    human_approval_default: false
+  - name: subtitles
+    agent: SubtitleProcessor
+    required_artifacts_in: [script, creative_direction]
+    produces: [subtitles]
+    checkpoint_required: true
+    human_approval_default: false
+  - name: montage
+    agent: ViralCinematicEditor
+    required_artifacts_in: [scene_plan, asset_manifest, creative_direction, script, subtitles]
+    produces: [edit_decisions]
+    checkpoint_required: true
+    human_approval_default: false
+  - name: compose
+    agent: ExportAgent
+    required_artifacts_in: [edit_decisions, asset_manifest]
+    produces: [render_report]
+    required_tools: [video_compose]
+    checkpoint_required: true
+    human_approval_default: false
+  - name: quality_control
+    agent: QualityControlAgent
+    required_artifacts_in: [render_report, creative_direction, script, asset_manifest]
+    produces: [qc_report]
+    checkpoint_required: true
+    human_approval_default: false
+  - name: retention_analysis
+    agent: RetentionAgent
+    required_artifacts_in: [render_report, script, creative_direction]
+    produces: [retention_report]
+    checkpoint_required: true
+    human_approval_default: false
+  - name: creative_memory
+    agent: CreativeMemoryAgent
+    required_artifacts_in: [qc_report, creative_direction, script, asset_manifest, edit_decisions]
+    produces: [memory_update]
+    checkpoint_required: true
+    human_approval_default: false

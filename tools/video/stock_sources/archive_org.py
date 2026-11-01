@@ -139,6 +139,20 @@ class ArchiveOrgSource:
         if kind not in ("video", "any"):
             return []
 
+        # Exact item lookup is useful when a known public-domain record has
+        # already been verified. It avoids the broad OR fallback below,
+        # which can otherwise return unrelated Archive.org uploads for a
+        # topical query. The `id:` form is consumed only by this adapter and
+        # still hydrates metadata and applies the caller's media filters.
+        if query.startswith("id:"):
+            identifier = query[3:].strip()
+            if not re.fullmatch(r"[A-Za-z0-9._-]{1,120}", identifier):
+                return []
+            candidate = self._hydrate_candidate(
+                {"identifier": identifier, "title": identifier}, filters
+            )
+            return [candidate] if candidate is not None else []
+
         import requests  # lazy
 
         for _label, solr_q in self._build_queries(query):

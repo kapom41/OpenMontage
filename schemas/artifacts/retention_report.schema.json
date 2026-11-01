@@ -1,0 +1,41 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Retention Report",
+  "type": "object",
+  "properties": {
+    "video_duration_seconds": {"type": "number"},
+    "start_retention": {"type": "number"},
+    "end_retention": {"type": "number"},
+    "hook_leak_percentage": {"type": "number"},
+    "hook_leak_verdict": {"type": "string"},
+    "cliffs": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "type": {"type": "string"},
+          "position_seconds": {"type": "number"},
+          "position_percentage": {"type": "number"},
+          "severity": {"type": "number"},
+          "description": {"type": "string"},
+          "transcript_context": {"type": "string"},
+          "fix_recommendation": {"type": "string"}
+        },
+        "required": ["type", "position_seconds", "position_percentage", "severity", "description", "transcript_context", "fix_recommendation"]
+      }
+    },
+    "slide_rate": {"type": "number"},
+    "slide_verdict": {"type": "string"},
+    "total_leaks": {"type": "integer"},
+    "biggest_leak": {"type": ["object", "null"]},
+    "primary_fix": {"type": "string"},
+    "secondary_fixes": {"type": "array", "items": {"type": "string"}},
+    "analyzed_at": {"type": "string"},
+    "predicted_hook_retention": {"type": "number"},
+    "predicted_slide_rate": {"type": "number"},
+    "predicted_end_retention": {"type": "number"},
+    "risk_factors": {"type": "array", "items": {"type": "object"}},
+    "recommendations": {"type": "array", "items": {"type": "string"}}
+  },
+  "required": ["predicted_hook_retention", "predicted_slide_rate", "predicted_end_retention", "risk_factors", "recommendations"]
+}

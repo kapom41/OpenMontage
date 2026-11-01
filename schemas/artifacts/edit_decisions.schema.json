@@ -61,9 +61,14 @@
             "type": "string",
             "description": "Backing color used behind this cut by composition runtimes"
           },
-          "reason": { "type": "string" }
+          "reason": { "type": "string" },
+          "color_grade": { "type": "string" },
+          "film_grain": { "type": "boolean" },
+          "vignette": { "type": ["object", "null"] },
+          "dynamic_zoom": { "type": ["object", "null"] },
+          "target_aspect": { "type": "string" }
         },
-        "additionalProperties": false
+        "additionalProperties": true
       }
     },
     "overlays": {
@@ -195,7 +200,7 @@
     },
     "renderer_family": {
       "type": "string",
-      "enum": ["explainer-data", "explainer-teacher", "cinematic-trailer", "documentary-montage", "product-reveal", "screen-demo", "presenter", "animation-first"],
+      "enum": ["explainer-data", "explainer-teacher", "cinematic-trailer", "documentary-montage", "product-reveal", "screen-demo", "presenter", "animation-first", "viral-cinematic"],
       "description": "Locked at proposal stage — creative grammar for this deliverable. Preserved from proposal_packet; edit MUST NOT change without a logged decision."
     },
     "render_runtime": {

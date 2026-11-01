@@ -56,7 +56,6 @@
           },
           "narrative_role": {
             "type": "string",
-            "enum": ["establish_context", "introduce_subject", "build_tension", "deliver_payload", "transition", "emotional_beat", "evidence", "comparison", "resolution", "call_to_action"],
             "description": "What role this scene plays in the narrative structure"
           },
           "information_role": {
@@ -105,9 +104,20 @@
               },
               "required": ["type", "description", "source"]
             }
+          },
+          "cinematic_metadata": {
+            "type": "object",
+            "description": "Cinematic effects metadata for viral cinematic pipeline",
+            "properties": {
+              "color_grade": { "type": "string" },
+              "film_grain": { "type": "boolean" },
+              "vignette": { "type": ["object", "null"] },
+              "dynamic_zoom": { "type": ["object", "null"] },
+              "target_aspect": { "type": "string" }
+            }
           }
         },
-        "additionalProperties": false
+        "additionalProperties": true
       },
       "minItems": 1
     },

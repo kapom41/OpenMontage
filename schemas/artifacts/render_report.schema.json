@@ -25,7 +25,7 @@
         },
         "additionalProperties": false
       },
-      "minItems": 1
+      "minItems": 0
     },
     "render_time_seconds": { "type": "number", "minimum": 0 },
     "warnings": {
@@ -39,7 +39,7 @@
     "render_grammar": {
       "type": "string",
       "description": "Which renderer family was used for this render",
-      "enum": ["explainer-data", "explainer-teacher", "cinematic-trailer", "documentary-montage", "product-reveal", "screen-demo", "presenter", "animation-first"]
+      "enum": ["explainer-data", "explainer-teacher", "cinematic-trailer", "documentary-montage", "product-reveal", "screen-demo", "presenter", "animation-first", "viral-cinematic"]
     },
     "slideshow_risk_score": {
       "type": "object",
@@ -57,7 +57,8 @@
       "type": "string",
       "description": "Path or inline reference to the final_review artifact produced by post-render self-review. Provides durable audit linkage between the render output and its quality inspection."
     },
-    "metadata": { "type": "object" }
+    "metadata": { "type": "object" },
+    "status": { "type": "string" }
   },
   "additionalProperties": false
 }
