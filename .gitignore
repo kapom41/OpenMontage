@@ -86,6 +86,17 @@ rewrite_section.py
 test_compile.py
 creative_memory.db
 
+# Internal docs (strategy, handoffs, playbooks — not shipped)
+internal/
+DELIVERY_REPORT*.md
+INTEGRATION_PLAN.md
+
+# Downloaded assets (regenerable from source APIs)
+assets/archive/
+
+# Remotion test props
+remotion-composer/test_props.json
+
 # Generated images (logo drafts — final logo lives in assets/)
 logo_*.png
 generated_image.png
